@@ -8,7 +8,7 @@ Check items off as they are completed. Work in order. Do not start a phase until
 - **Feature freeze:** Nov 11, midday. After this, only fixes, README, video, and submission.
 - **Hard deadline:** Nov 12, 12:00 pm PT. Never plan to use the last day.
 
-**Cut order if behind (cut from the top first):** FR-14 MCP, FR-13 Channel3, streaming, injection flagging UI polish, ledger filters, Mode A (use Mode B), mock-LLM fixtures beyond the five scenarios.
+**Cut order applied (scope tightened for deadline):** Skipping FR-14 MCP, FR-13 Channel3, T4.x SSE streaming, ledger filters, and Mode A (Mode B confirmed and locked).
 
 ---
 
@@ -43,12 +43,12 @@ Check items off as they are completed. Work in order. Do not start a phase until
 
 ## Phase 2: Persistence and orchestration (about 3h)
 
-- [ ] **T2.1 Database layer.** SQLite schema for mandates, purchases, approvals, audit_events. Migrations run on boot. Audit log has insert and read only. *Accept:* repository tests with an in-memory DB.
-- [ ] **T2.2 Audit service.** Typed event creation, written in the same transaction as the state change. *Accept:* ordering test.
-- [ ] **T2.3 Product catalog and provider.** `src/data/products.json` with about 24 products across running gear, nutrition, and a few off-category items. Must include: gels at $24, trail running shoes at $89, a GPS watch at $249 (electronics), one item from merchant `ShadyDeals`, a headlamp whose description contains injection-bait text, and a $45 hydration vest. A `ProductProvider` interface and the local implementation with keyword search. *Accept:* search tests.
-- [ ] **T2.4 Executor interface and fake.** `PaymentExecutor` interface plus an in-memory fake for tests. *Accept:* interface documented in TDD terms.
-- [ ] **T2.5 Purchase orchestrator.** Policy then audit then (APPROVE: execute, ASK_HUMAN: create approval, DENY: stop). *Accept:* TDD 8.3 tests (first three bullets) pass.
-- [ ] **T2.6 Approval service.** Approve (re-evaluate policy, idempotent), reject. *Accept:* remaining TDD 8.3 tests pass.
+- [x] **T2.1 Database layer.** SQLite schema for mandates, purchases, approvals, audit_events. Migrations run on boot. Audit log has insert and read only. *Accept:* repository tests with an in-memory DB.
+- [x] **T2.2 Audit service.** Typed event creation, written in the same transaction as the state change. *Accept:* ordering test.
+- [x] **T2.3 Product catalog and provider.** `src/data/products.json` with about 24 products across running gear, nutrition, and a few off-category items. Must include: gels at $24, trail running shoes at $89, a GPS watch at $249 (electronics), one item from merchant `ShadyDeals`, a headlamp whose description contains injection-bait text, and a $45 hydration vest. A `ProductProvider` interface and the local implementation with keyword search. *Accept:* search tests.
+- [x] **T2.4 Executor interface and fake.** `PaymentExecutor` interface plus an in-memory fake for tests. *Accept:* interface documented in TDD terms.
+- [x] **T2.5 Purchase orchestrator.** Policy then audit then (APPROVE: execute, ASK_HUMAN: create approval, DENY: stop). *Accept:* TDD 8.3 tests (first three bullets) pass.
+- [x] **T2.6 Approval service.** Approve (re-evaluate policy, idempotent), reject. *Accept:* remaining TDD 8.3 tests pass.
 
 **Checkpoint 2:** all orchestration works with the fake executor. Tests green.
 
@@ -57,9 +57,9 @@ Check items off as they are completed. Work in order. Do not start a phase until
 ## Phase 3: PayPal executor (about 3h)
 
 - [ ] **T3.1 PayPal client.** Token cache, create order, capture, idempotency header, error mapping, sandbox guard. *Accept:* TDD 8.4 tests pass with mocked fetch.
-- [ ] **T3.2 Executor implementation** for the mode chosen in S1. 
-  - Mode A: connect flow (setup token, payment token), server-side create and capture with the saved token.
-  - Mode B: create order, approval redirect, return and cancel handlers, capture on return.
+- [ ] **T3.0 Mode B redirect smoke test (10m).** Create a `$1.00 USD` sandbox order, print only the `payer-action` URL, and stop so the user can verify sandbox buyer login works before building T3.2.
+- [ ] **T3.2 Executor implementation** for Mode B (confirmed):
+  - Create order (`intent: "CAPTURE"`, `payment_source.paypal.experience_context`), approval redirect (`payer-action`), return and cancel handlers, capture on return.
   - *Accept:* a real sandbox purchase is captured end-to-end and visible in the PayPal sandbox dashboard. Order id appears in the audit log.
 - [ ] **T3.3 Architecture guard test.** TDD 8.6. *Accept:* test fails if a forbidden import is introduced (verify by temporarily adding one).
 
