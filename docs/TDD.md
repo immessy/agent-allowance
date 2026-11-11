@@ -170,9 +170,10 @@ An `LlmClient` interface with two capabilities: (a) produce structured output va
 Base URL (sandbox): `https://api-m.sandbox.paypal.com`. **Verify every endpoint and field against current PayPal docs before coding. Docs win over this document.**
 
 ### Primitives
-- OAuth 2.0 client-credentials token, cached in memory until shortly before expiry.
-- Create order: Orders v2 (`/v2/checkout/orders`), intent `CAPTURE`, one purchase unit with amount in USD and an item breakdown.
-- Capture order: `/v2/checkout/orders/{id}/capture`.
+- OAuth 2.0 client-credentials token (`/v1/oauth2/token`), cached in memory until shortly before expiry.
+- Create order: Orders v2 (`/v2/checkout/orders`), intent `CAPTURE`, one purchase unit with amount in USD and an item breakdown. Note: when supplying `payment_source.paypal.experience_context`, PayPal returns `200` (`PAYER_ACTION_REQUIRED`) with link `rel: "payer-action"`.
+- Capture order: `/v2/checkout/orders/{id}/capture` (only needed if the create-order response is not already `COMPLETED`).
+- Vault v3 (Mode A): `POST /v3/vault/setup-tokens` (`usage_type: "MERCHANT"`, `experience_context`) returns `approve` URL; on return, exchange via `POST /v3/vault/payment-tokens` with `payment_source: { token: { id, type: "SETUP_TOKEN" } }` to obtain a reusable `vault_id`; charge later via `POST /v2/checkout/orders` with `payment_source: { paypal: { vault_id } }`.
 - Every write sends a `PayPal-Request-Id` idempotency header derived from the purchase id and step.
 - Errors map to a small internal error type (auth, validation, declined, transient). Transient errors retry with backoff, up to 2 times.
 

@@ -16,13 +16,13 @@ Check items off as they are completed. Work in order. Do not start a phase until
 
 - [x] **T0.1 Repo scaffold (30m).** Next.js + TypeScript strict + Tailwind + Vitest + Zod + ESLint. MIT `LICENSE`, `.gitignore` (includes `.env`), `.env.example` listing every variable in TDD section 10, empty README skeleton, docs copied into `docs/`.
   - *Accept:* `npm install`, `npm run dev`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build` all succeed on a clean clone.
-- [ ] **T0.2 Spike S1: PayPal sandbox feasibility (60m max).** Using the current PayPal docs, with the user's sandbox credentials in `.env`:
+- [x] **T0.2 Spike S1: PayPal sandbox feasibility (60m max).** Using the current PayPal docs, with the user's sandbox credentials in `.env`:
   1. Obtain an access token.
   2. Create a sandbox order.
   3. Determine whether a **vaulted payment token** flow (Mode A) can be completed with the sandbox buyer account so an order can be captured server-side without buyer interaction.
   4. Determine the minimum steps for Mode B (approve redirect, then capture).
   - *Accept:* a short written report in `docs/SPIKE_S1.md` (what worked, exact endpoints used, blockers, recommendation). **Stop and report to the user before continuing.**
-- [ ] **T0.3 Spike S2: LLM connectivity (15m).** Confirm the configured model works for (a) structured output and (b) tool use. Report the model name in use.
+- [x] **T0.3 Spike S2: LLM connectivity (15m).** Confirm the configured model works for (a) structured output and (b) tool use. Report the model name in use.
   - *Accept:* one successful call for each, noted in `docs/SPIKE_S1.md` (append).
 
 **Checkpoint 0:** scaffold builds. S1 decision (Mode A or B) is agreed with the user.
