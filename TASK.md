@@ -35,7 +35,7 @@ Check items off as they are completed. Work in order. Do not start a phase until
 - [x] **T1.1 Money utilities.** Integer cents parse and format, safe arithmetic helpers. *Accept:* tests in TDD 8.2 pass.
 - [x] **T1.2 Schemas and types.** Mandate, Product, PurchaseRequest, PolicyContext, PolicyDecision. *Accept:* schema tests in TDD 8.2 pass.
 - [x] **T1.3 Policy engine.** Implement TDD section 4 evaluation order. *Accept:* **all** cases in TDD 8.1 written first, seen failing, then passing. Determinism test included.
-- [ ] **T1.4 Month window helper.** UTC calendar month boundaries, `now` injected. *Accept:* boundary tests in TDD 8.2 pass.
+- [x] **T1.4 Month window helper.** UTC calendar month boundaries, `now` injected. *Accept:* boundary tests in TDD 8.2 pass.
 
 **Checkpoint 1:** `npm test` green. Policy engine has no imports from outside `domain`.
 
