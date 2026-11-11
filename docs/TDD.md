@@ -178,20 +178,16 @@ Base URL (sandbox): `https://api-m.sandbox.paypal.com`. **Verify every endpoint 
 - Errors map to a small internal error type (auth, validation, declined, transient). Transient errors retry with backoff, up to 2 times.
 
 ### The buyer-approval problem (critical)
-A standard PayPal order must be approved by the buyer before capture. A fully autonomous agent therefore needs a saved payment method. Plan for two modes and **decide in Spike S1**:
+A standard PayPal order must be approved by the buyer before capture.
 
-**Mode A (preferred): vaulted PayPal wallet.**
-- One-time "Connect PayPal" step with the sandbox buyer account, using the Vault v3 setup-token and payment-token flow (`/v3/vault/setup-tokens`, `/v3/vault/payment-tokens`).
-- That connection is framed in the product as the user granting the agent a spending allowance.
-- Afterward, orders for approved purchases are created with the saved payment token and captured server-side with no buyer interaction.
-- May require the Vault feature to be enabled for the sandbox app and business account.
-
-**Mode B (fallback): buyer-approval redirect per payment.**
-- On `APPROVE` or after human approval, create the order and send the user through PayPal's approval page, then capture on return.
-- The policy engine, approval inbox, and ledger are identical. Only the final payment step involves the PayPal approval screen.
-- Be honest in the pitch: "policy decides whether the agent may proceed, PayPal handles buyer authentication."
-
-Both modes sit behind a `PaymentExecutor` interface so the rest of the system doesn't change.
+**Decision (2026-11-11, post-T0.4 fallback): Mode B (Orders v2 buyer-approval redirect + capture) selected.**
+- Mode A (Vault v3 `setup-tokens` -> `agreements/approve`) returned `201 Created` at the API level during Spike S1/T0.4, but PayPal's hosted `/agreements/approve` UI rejected buyer consent after login (*"Things don't appear to be working at the moment"*), consistent with PayPal Wallet Vaulting regional/account feature restrictions.
+- **Mode B flow:**
+  1. On `APPROVE` (or after human approval of an `ASK_HUMAN` request), create an Orders v2 order (`POST /v2/checkout/orders`, `intent: "CAPTURE"`, `payment_source.paypal.experience_context`) and store the `payer-action` approval URL on the purchase record.
+  2. In the UI, prompt/redirect the buyer to PayPal's `payer-action` sandbox checkout page to authenticate and approve payment.
+  3. On return (`/api/paypal/connect/return`), capture the order server-side (`POST /v2/checkout/orders/{id}/capture` with `PayPal-Request-Id`), mark the purchase `captured`, and append `PAYPAL_CAPTURED` to the audit log. On cancel (`/api/paypal/connect/cancel`), mark appropriately and log.
+- The policy engine, Approval Inbox, and ledger are identical. Pitch framing: "policy decides whether the agent may proceed; PayPal handles buyer authentication."
+- Everything sits behind the `PaymentExecutor` interface so Mode A can be plugged in later without changing domain or orchestration.
 
 ### Optional: PayPal MCP / Agent Toolkit (FR-14)
 Time-boxed secondary use (for example, read an order or create an invoice via the sandbox MCP server). Only attempt if all Must items are done.

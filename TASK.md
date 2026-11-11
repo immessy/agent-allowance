@@ -24,8 +24,9 @@ Check items off as they are completed. Work in order. Do not start a phase until
   - *Accept:* a short written report in `docs/SPIKE_S1.md` (what worked, exact endpoints used, blockers, recommendation). **Stop and report to the user before continuing.**
 - [x] **T0.3 Spike S2: LLM connectivity (15m).** Confirm the configured model works for (a) structured output and (b) tool use. Report the model name in use.
   - *Accept:* one successful call for each, noted in `docs/SPIKE_S1.md` (append).
+- [x] **T0.4 Spike Mode A end-to-end (45m time-box).** Tested Vault v3 setup token (`00751182AD290262M` -> `201 PAYER_ACTION_REQUIRED`); hosted `/agreements/approve` failed after sandbox buyer login (*"Things don't appear to be working at the moment"*). Triggered fallback rule per time-box: switched to **Mode B (Orders v2 approve redirect + capture)** and documented in `docs/SPIKE_S1.md` and `docs/TDD.md`.
 
-**Checkpoint 0:** scaffold builds. S1 decision (Mode A or B) is agreed with the user.
+**Checkpoint 0:** scaffold builds. Payment mode decision (Mode B) agreed with the user.
 
 ---
 

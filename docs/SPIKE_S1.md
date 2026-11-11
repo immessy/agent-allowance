@@ -25,35 +25,31 @@ Environment: `PAYPAL_ENV=sandbox` (`https://api-m.sandbox.paypal.com`)
   2. Buyer logs into sandbox personal account and approves.
   3. Return handler captures via `POST /v2/checkout/orders/{id}/capture` with `PayPal-Request-Id`.
 
-### 3. Vault v3 (Mode A feasibility)
+### 3. Vault v3 (Mode A feasibility & T0.4 result)
 - **Create Setup Token:** `POST /v3/vault/setup-tokens` with `PayPal-Request-Id` and:
   ```json
   {
     "payment_source": {
       "paypal": {
         "usage_type": "MERCHANT",
+        "customer_type": "CONSUMER",
+        "permit_multiple_payment_tokens": true,
         "experience_context": {
           "brand_name": "Agent Allowance",
-          "return_url": "http://localhost:3000/api/paypal/connect/return",
-          "cancel_url": "http://localhost:3000/api/paypal/connect/cancel"
+          "shipping_preference": "NO_SHIPPING",
+          "return_url": "https://example.com/paypal-vault-return",
+          "cancel_url": "https://example.com/paypal-vault-cancel"
         }
       }
     }
   }
   ```
-- **Result:** **`201 Created`**, setup token ID `3HS06098HK104090V`, `status: "PAYER_ACTION_REQUIRED"`, with `rel: "approve"` link (`https://www.sandbox.paypal.com/agreements/approve?...`).
-- **Payment Tokens API check:** `GET /v3/vault/payment-tokens?customer_id=spike_probe` returned `404 RESOURCE_NOT_FOUND` (`CUSTOMER_ID_NOT_FOUND`) rather than `403`, confirming Vault v3 permissions are enabled on this sandbox app.
-- **Full Mode A flow (per official PayPal Vault v3 + Orders v2 docs):**
-  1. One-time "Connect PayPal": call `POST /v3/vault/setup-tokens`, redirect user to `approve` URL to log in once with a sandbox buyer account and click Agree & Save.
-  2. Return handler: call `POST /v3/vault/payment-tokens` with `payment_source: { token: { id: "<setupTokenId>", type: "SETUP_TOKEN" } }` to mint a permanent `vault_id`.
-  3. Server-side purchase execution (no buyer redirect): call `POST /v2/checkout/orders` with `intent: "CAPTURE"` and `payment_source: { paypal: { vault_id: "<vaultId>" } }` (and call `POST /v2/checkout/orders/{id}/capture` if the returned status is not already `COMPLETED`).
+- **API result:** `201 Created`, setup token ID `00751182AD290262M`, `status: "PAYER_ACTION_REQUIRED"`, `links` with `rel: "approve"` (`https://www.sandbox.paypal.com/agreements/approve?approval_session_id=<id>`).
+- **Live buyer consent outcome (T0.4):** After buyer login with multiple personal sandbox accounts on `www.sandbox.paypal.com/agreements/approve`, PayPal's hosted UI errored with *"Things don't appear to be working at the moment"*. `GET /v3/vault/setup-tokens/00751182AD290262M` remained `200 PAYER_ACTION_REQUIRED`.
+- **Root cause:** PayPal Wallet Vaulting is region-restricted (only US, CA, UK, EU, AU, SG, JP, HK, CN; not India) and requires Vault/Reference Transactions enabled on a supported-region Sandbox Business account matching the buyer's flow.
 
-### Blockers / Caveats
-- Mode A still requires **one-time interactive approval** in a browser with a PayPal sandbox buyer account (to convert a `setup_token` into a `vault_id`). After that one-time connect, purchases capture autonomously server-side.
-- Mode B requires interactive buyer approval on every `APPROVE` and approved `ASK_HUMAN` purchase.
-
-### Recommendation
-**Recommend Mode A (Vaulted PayPal wallet).** Vault v3 is already enabled on this sandbox app (`201 Created` on `/v3/vault/setup-tokens`, `readwrite` Vault scope active), and one-time wallet connection aligns directly with the product promise ("grant the agent an allowance" so routine `APPROVE` purchases execute autonomously without redirecting away from chat).
+### Final Decision (T0.4 Fallback Applied)
+**Switched to Mode B (Orders v2 buyer-approval redirect + server-side capture).** Mode B avoids Vault v3 / Reference Transactions sandbox account eligibility blockers while preserving the exact policy engine, Approval Inbox, and AG Grid ledger architecture.
 
 ---
 
