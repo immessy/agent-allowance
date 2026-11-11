@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Next.js
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# SQLite databases
+data/*.db
+data/*.db-wal
+data/*.db-shm
+*.db
+*.sqlite
+
+# Testing & logs
+coverage/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
