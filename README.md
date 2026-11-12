@@ -18,7 +18,11 @@ Scaffolding in progress (Phase 0). See [TASK.md](TASK.md), [docs/PRD.md](docs/PR
    npm run dev
    ```
 
-## Commands
+## Payment and LLM Modes
+
+- **Real Mode (default when PayPal credentials are set):** Uses `PayPalClient` against `https://api-m.sandbox.paypal.com` (Orders v2 Mode B buyer-approval redirect + server-side idempotent capture) and Anthropic Messages API (`ANTHROPIC_MODEL`). All live PayPal transactions stay strictly within `PAYPAL_ENV=sandbox`.
+- **Simulated Payment Mode (`PAYMENT_MODE=simulated`):** Must be enabled explicitly via environment variable. Replaces real PayPal REST API calls with `FakePaymentExecutor`, prefixes order IDs with `SIM-ORD-`, and labels all UI badges and audit ledger records as **`[SIMULATED]`**.
+- **Mock LLM Mode (`MOCK_LLM=1`):** Replays deterministic scripted responses (`ScriptedLlmClient`) for automated tests and the 5 PRD demo scenarios without calling Anthropic.
 
 - `npm install` — Install dependencies locally in `./node_modules`
 - `npm run dev` — Start the Next.js development server

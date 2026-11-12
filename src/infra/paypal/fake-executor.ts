@@ -13,6 +13,7 @@ export interface FakePaymentExecutorOptions {
 }
 
 export class FakePaymentExecutor implements PaymentExecutor {
+  readonly isSimulated = true;
   readonly createCalls: CreatePaymentOrderInput[] = [];
   readonly captureCalls: CapturePaymentOrderInput[] = [];
   private seq = 0;
@@ -28,7 +29,7 @@ export class FakePaymentExecutor implements PaymentExecutor {
     }
 
     this.seq += 1;
-    const orderId = `FAKE-ORD-${this.seq}`;
+    const orderId = `SIM-ORD-${this.seq}`;
     if (this.options.mode === "redirect") {
       return {
         orderId,
@@ -41,7 +42,7 @@ export class FakePaymentExecutor implements PaymentExecutor {
       orderId,
       status: "COMPLETED",
       approvalUrl: null,
-      captureId: `FAKE-CAP-${this.seq}`,
+      captureId: `SIM-CAP-${this.seq}`,
     };
   }
 
@@ -54,7 +55,7 @@ export class FakePaymentExecutor implements PaymentExecutor {
     }
     return {
       orderId: input.orderId,
-      captureId: `FAKE-CAP-${input.orderId}`,
+      captureId: `SIM-CAP-${input.orderId}`,
       status: "COMPLETED",
     };
   }

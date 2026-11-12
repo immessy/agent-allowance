@@ -38,6 +38,8 @@ export interface AppContainer {
     isMockLlm: boolean;
     hasAnthropicKey: boolean;
     hasPayPalCredentials: boolean;
+    paymentMode: "real" | "simulated";
+    isSimulated: boolean;
   };
   nowFn: () => Date;
   resetDemoData: () => { success: boolean; durationMs: number };
@@ -97,17 +99,22 @@ export function createContainer(overrides?: {
   const audit = new AuditService(repos.audit, nowFn);
   const products = new LocalProductProvider();
 
-  const useFake =
-    overrides?.useFakeExecutor ??
-    (!clientId.trim() ||
-      !clientSecret.trim() ||
-      process.env.USE_FAKE_PAYPAL === "1");
+  const isSimulated =
+    overrides?.useFakeExecutor !== undefined
+      ? overrides.useFakeExecutor
+      : process.env.PAYMENT_MODE === "simulated";
+
+  if (!isSimulated && (!clientId.trim() || !clientSecret.trim())) {
+    throw new Error(
+      "PayPal credentials (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET) are missing. Real mode is the default when running outside test harnesses. To run with simulated payments instead, explicitly set PAYMENT_MODE=simulated."
+    );
+  }
 
   const fakeMode =
     overrides?.fakeMode ??
     (process.env.FAKE_PAYPAL_MODE === "redirect" ? "redirect" : "auto-capture");
 
-  const executor: PaymentExecutor = useFake
+  const executor: PaymentExecutor = isSimulated
     ? new FakePaymentExecutor({ mode: fakeMode })
     : new PayPalPaymentExecutor({
         env: "sandbox",
@@ -165,6 +172,8 @@ export function createContainer(overrides?: {
       isMockLlm,
       hasAnthropicKey: Boolean(anthropicKey.trim()),
       hasPayPalCredentials: Boolean(clientId.trim() && clientSecret.trim()),
+      paymentMode: isSimulated ? "simulated" : "real",
+      isSimulated,
     },
     nowFn,
     resetDemoData,

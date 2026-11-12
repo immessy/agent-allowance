@@ -48,6 +48,8 @@ export async function executeAndRecordOrder(
     });
 
     const nowIso = deps.nowFn().toISOString();
+    const isSimulated = Boolean(deps.executor.isSimulated);
+    const simPrefix = isSimulated ? "[SIMULATED] " : "";
 
     return deps.db.transaction(() => {
       if (order.status === "COMPLETED") {
@@ -62,18 +64,23 @@ export async function executeAndRecordOrder(
           type: "PAYPAL_ORDER_CREATED",
           actor: "paypal",
           purchaseId: purchase.id,
-          summary: `Created PayPal order ${order.orderId} for ${formatCentsToUsd(purchase.totalCents)}`,
-          payload: { orderId: order.orderId, status: order.status },
+          summary: `${simPrefix}Created PayPal order ${order.orderId} for ${formatCentsToUsd(purchase.totalCents)}`,
+          payload: {
+            orderId: order.orderId,
+            status: order.status,
+            simulated: isSimulated,
+          },
         });
         deps.audit.record({
           type: "PAYPAL_CAPTURED",
           actor: "paypal",
           purchaseId: purchase.id,
-          summary: `Captured ${formatCentsToUsd(purchase.totalCents)} (Order ${order.orderId})`,
+          summary: `${simPrefix}Captured ${formatCentsToUsd(purchase.totalCents)} (Order ${order.orderId})`,
           payload: {
             orderId: order.orderId,
             captureId: order.captureId ?? null,
             amountCents: purchase.totalCents,
+            simulated: isSimulated,
           },
         });
       } else {
@@ -87,8 +94,12 @@ export async function executeAndRecordOrder(
           type: "PAYPAL_ORDER_CREATED",
           actor: "paypal",
           purchaseId: purchase.id,
-          summary: `Created PayPal order ${order.orderId} awaiting buyer approval`,
-          payload: { orderId: order.orderId, status: order.status },
+          summary: `${simPrefix}Created PayPal order ${order.orderId} awaiting buyer approval`,
+          payload: {
+            orderId: order.orderId,
+            status: order.status,
+            simulated: isSimulated,
+          },
         });
       }
 
@@ -97,6 +108,8 @@ export async function executeAndRecordOrder(
   } catch (err) {
     const nowIso = deps.nowFn().toISOString();
     const errorInfo = getSafeErrorInfo(err);
+    const isSimulated = Boolean(deps.executor.isSimulated);
+    const simPrefix = isSimulated ? "[SIMULATED] " : "";
     return deps.db.transaction(() => {
       deps.repos.purchases.updateState(purchase.id, {
         status: "failed",
@@ -106,8 +119,8 @@ export async function executeAndRecordOrder(
         type: "PAYPAL_FAILED",
         actor: "paypal",
         purchaseId: purchase.id,
-        summary: `PayPal order failed: ${errorInfo.message}`,
-        payload: { code: errorInfo.code },
+        summary: `${simPrefix}PayPal order failed: ${errorInfo.message}`,
+        payload: { code: errorInfo.code, simulated: isSimulated },
       });
       return deps.repos.purchases.findById(purchase.id) ?? purchase;
     });

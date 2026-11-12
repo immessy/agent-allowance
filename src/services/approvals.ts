@@ -261,6 +261,8 @@ export class ApprovalService {
       });
 
       const nowIso = this.nowFn().toISOString();
+      const isSimulated = Boolean(this.executor.isSimulated);
+      const simPrefix = isSimulated ? "[SIMULATED] " : "";
       return this.db.transaction(() => {
         const latest = this.repos.purchases.findById(existing.id);
         if (latest?.status === "captured") {
@@ -276,17 +278,20 @@ export class ApprovalService {
           type: "PAYPAL_CAPTURED",
           actor: "paypal",
           purchaseId: existing.id,
-          summary: `Captured ${formatCentsToUsd(existing.totalCents)} (Order ${capture.orderId})`,
+          summary: `${simPrefix}Captured ${formatCentsToUsd(existing.totalCents)} (Order ${capture.orderId})`,
           payload: {
             orderId: capture.orderId,
             captureId: capture.captureId,
             amountCents: existing.totalCents,
+            simulated: isSimulated,
           },
         });
         return this.repos.purchases.findById(existing.id) ?? existing;
       });
     } catch (err) {
       const nowIso = this.nowFn().toISOString();
+      const isSimulated = Boolean(this.executor.isSimulated);
+      const simPrefix = isSimulated ? "[SIMULATED] " : "";
       const message =
         err instanceof Error ? err.message : "PayPal capture failed";
       const code =
@@ -304,8 +309,8 @@ export class ApprovalService {
           type: "PAYPAL_FAILED",
           actor: "paypal",
           purchaseId: existing.id,
-          summary: `PayPal capture failed for order ${paypalOrderId}: ${message}`,
-          payload: { orderId: paypalOrderId, code },
+          summary: `${simPrefix}PayPal capture failed for order ${paypalOrderId}: ${message}`,
+          payload: { orderId: paypalOrderId, code, simulated: isSimulated },
         });
       });
 

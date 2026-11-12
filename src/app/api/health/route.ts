@@ -11,6 +11,8 @@ export async function GET() {
       env: container.config.paypalEnv,
       configured: container.config.hasPayPalCredentials,
       mode: "B",
+      paymentMode: container.config.paymentMode,
+      isSimulated: container.config.isSimulated,
     },
     llm: {
       mock: container.config.isMockLlm,

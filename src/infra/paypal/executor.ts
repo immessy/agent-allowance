@@ -12,6 +12,7 @@ import { PayPalClient } from "./client";
  * This is the ONLY module in the application permitted to import PayPalClient.
  */
 export class PayPalPaymentExecutor implements PaymentExecutor {
+  readonly isSimulated = false;
   private readonly client: PayPalClient;
 
   constructor(config: {

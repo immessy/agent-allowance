@@ -82,14 +82,14 @@ Check items off as they are completed. Work in order. Do not start a phase until
 
 ## Phase 5: UI (about 4h, Day 2 morning)
 
-- [ ] **T5.1 App shell and layout.** One page with Mandate panel, Agent chat, Approval Inbox, and Ledger tab. Clean, readable, responsive down to a laptop screen.
-- [ ] **T5.2 Mandate panel.** Text input, Parse, rule preview with editable fields and warnings, Activate, clarifying-question display.
-- [ ] **T5.3 Budget meter.** Spent, pending, remaining, updated after every purchase.
-- [ ] **T5.4 Agent chat.** Messages plus visible agent steps (searching, found, requesting, decision). Decision chips: green approved, amber needs approval, red denied, each with the plain-language reason and numbers.
-- [ ] **T5.5 Approval Inbox.** Pending items with product, price, triggering rule, Approve and Reject. Handles the Mode A or Mode B payment step.
-- [ ] **T5.6 AG Grid ledger.** Columns: time, event type, actor, product, amount, decision, reason, PayPal order id. Sorting and a quick filter. Row styling by event type.
-- [ ] **T5.7 Empty, loading, and error states.** Friendly messages. No raw errors.
-- [ ] **T5.8 Demo mode touches.** Reset button, one-click "Try: ..." example prompts for the five scenarios.
+- [x] **T5.1 App shell and layout.** One page with Mandate panel, Agent chat, Approval Inbox, and Ledger tab. Clean, readable, responsive down to a laptop screen.
+- [x] **T5.2 Mandate panel.** Text input, Parse, rule preview with editable fields and warnings, Activate, clarifying-question display.
+- [x] **T5.3 Budget meter.** Spent, pending, remaining, updated after every purchase.
+- [x] **T5.4 Agent chat.** Messages plus visible agent steps (searching, found, requesting, decision). Decision chips: green approved, amber needs approval, red denied, each with the plain-language reason and numbers.
+- [x] **T5.5 Approval Inbox.** Pending items with product, price, triggering rule, Approve and Reject. Handles the Mode A or Mode B payment step.
+- [x] **T5.6 AG Grid ledger.** Columns: time, event type, actor, product, amount, decision, reason, PayPal order id. Sorting and a quick filter. Row styling by event type.
+- [x] **T5.7 Empty, loading, and error states.** Friendly messages. No raw errors.
+- [x] **T5.8 Demo mode touches.** Reset button, one-click "Try: ..." example prompts for the five scenarios.
 
 **Checkpoint 5:** all five demo scenarios run in the UI against the real sandbox and real LLM, start to finish.
 

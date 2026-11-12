@@ -26,6 +26,7 @@ export interface CapturePaymentOrderResult {
 }
 
 export interface PaymentExecutor {
+  readonly isSimulated?: boolean;
   createOrder(input: CreatePaymentOrderInput): Promise<CreatePaymentOrderResult>;
   captureOrder(
     input: CapturePaymentOrderInput
