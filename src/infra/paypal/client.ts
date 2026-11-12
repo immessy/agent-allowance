@@ -97,6 +97,7 @@ export interface CreateOrderParams {
   amountCents: number;
   returnUrl: string;
   cancelUrl: string;
+  attempt?: number;
 }
 
 export interface PayPalOrderCreated {
@@ -260,7 +261,9 @@ export class PayPalClient {
 
   async createOrder(params: CreateOrderParams): Promise<PayPalOrderCreated> {
     const value = formatCentsToDecimal(params.amountCents);
-    const idempotencyKey = `aa-${params.purchaseId}-create`;
+    const idempotencyKey = params.attempt
+      ? `aa-${params.purchaseId}-create-${params.attempt}`
+      : `aa-${params.purchaseId}-create`;
 
     const response = await this.requestWithRetry(
       `${SANDBOX_BASE_URL}/v2/checkout/orders`,
@@ -276,6 +279,7 @@ export class PayPalClient {
           purchase_units: [
             {
               reference_id: params.purchaseId,
+              description: params.title.slice(0, 127),
               amount: {
                 currency_code: "USD",
                 value,
@@ -294,6 +298,7 @@ export class PayPalClient {
                     currency_code: "USD",
                     value,
                   },
+                  category: "DIGITAL_GOODS",
                 },
               ],
             },

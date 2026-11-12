@@ -27,6 +27,7 @@ export interface AgentChatProps {
   isSending: boolean;
   isSimulated: boolean;
   onSendMessage: (message: string) => Promise<void>;
+  onRetryOrder?: (purchaseId: string) => Promise<void>;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -89,6 +90,7 @@ export function AgentChat({
   isSending,
   isSimulated,
   onSendMessage,
+  onRetryOrder,
 }: AgentChatProps) {
   const [input, setInput] = useState("");
 
@@ -187,12 +189,23 @@ export function AgentChat({
                               </span>
                             )}
                           </div>
-                          <a
-                            href={purchase.paypalApprovalUrl}
-                            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 font-semibold text-white shadow-xs hover:bg-blue-700"
-                          >
-                            Confirm payment on PayPal →
-                          </a>
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={purchase.paypalApprovalUrl}
+                              className="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 font-semibold text-white shadow-xs hover:bg-blue-700"
+                            >
+                              Confirm payment on PayPal →
+                            </a>
+                            {onRetryOrder && (
+                              <button
+                                type="button"
+                                onClick={() => onRetryOrder(purchase.id)}
+                                className="inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1.5 font-medium text-slate-700 shadow-xs hover:bg-slate-50"
+                              >
+                                Try again (fresh order)
+                              </button>
+                            )}
+                          </div>
                         </div>
                       );
                     }

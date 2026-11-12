@@ -33,6 +33,7 @@ export class PayPalPaymentExecutor implements PaymentExecutor {
       amountCents: input.amountCents,
       returnUrl: input.returnUrl,
       cancelUrl: input.cancelUrl,
+      attempt: input.attempt,
     });
 
     if (created.status === "COMPLETED") {

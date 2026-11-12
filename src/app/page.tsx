@@ -205,6 +205,21 @@ function DashboardContent() {
     await refreshState();
   };
 
+  const handleRetryOrder = async (purchaseId: string) => {
+    try {
+      const res = await fetch(`/api/purchases/${purchaseId}/retry`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message ?? "Failed to create fresh order.");
+      }
+      await refreshState();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to retry order.");
+    }
+  };
+
   const handleResetDemo = async () => {
     setIsResetting(true);
     try {
@@ -273,6 +288,7 @@ function DashboardContent() {
                 isSimulated={isSimulated}
                 onApprove={handleApprove}
                 onReject={handleReject}
+                onRetryOrder={handleRetryOrder}
               />
             </div>
 
@@ -283,6 +299,7 @@ function DashboardContent() {
                 isSending={isSending}
                 isSimulated={isSimulated}
                 onSendMessage={handleSendMessage}
+                onRetryOrder={handleRetryOrder}
               />
 
               <AuditLedger

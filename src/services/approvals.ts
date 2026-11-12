@@ -344,5 +344,62 @@ export class ApprovalService {
       return this.repos.purchases.findById(existing.id) ?? existing;
     });
   }
+
+  async retryOrderForPurchase(purchaseId: string): Promise<PurchaseRecord> {
+    const purchase = this.repos.purchases.findById(purchaseId);
+    if (!purchase) {
+      throw new DomainError(
+        "PURCHASE_NOT_FOUND",
+        `Purchase "${purchaseId}" was not found.`
+      );
+    }
+    if (purchase.status === "captured") {
+      throw new DomainError(
+        "PURCHASE_NOT_PAYABLE",
+        "This purchase has already been captured."
+      );
+    }
+
+    const baseUrl = this.config.appBaseUrl.replace(/\/+$/, "");
+    const returnUrl = `${baseUrl}/api/paypal/connect/return`;
+    const cancelUrl = `${baseUrl}/api/paypal/connect/cancel`;
+
+    const order = await this.executor.createOrder({
+      purchaseId: purchase.id,
+      title: purchase.title,
+      amountCents: purchase.totalCents,
+      returnUrl,
+      cancelUrl,
+      attempt: Date.now(),
+    });
+
+    const nowIso = this.nowFn().toISOString();
+    const isSimulated = Boolean(this.executor.isSimulated);
+    const simPrefix = isSimulated ? "[SIMULATED] " : "";
+
+    return this.db.transaction(() => {
+      this.repos.purchases.updateState(purchase.id, {
+        status: "approved",
+        paypalOrderId: order.orderId,
+        paypalApprovalUrl: order.approvalUrl,
+        updatedAt: nowIso,
+      });
+
+      this.audit.record({
+        type: "PAYPAL_ORDER_CREATED",
+        actor: "paypal",
+        purchaseId: purchase.id,
+        summary: `${simPrefix}Created fresh PayPal order ${order.orderId} for ${formatCentsToUsd(purchase.totalCents)}`,
+        payload: {
+          orderId: order.orderId,
+          status: order.status,
+          simulated: isSimulated,
+          isRetry: true,
+        },
+      });
+
+      return this.repos.purchases.findById(purchase.id) ?? purchase;
+    });
+  }
 }
 

@@ -4,6 +4,7 @@ export interface CreatePaymentOrderInput {
   amountCents: number;
   returnUrl: string;
   cancelUrl: string;
+  attempt?: number;
 }
 
 export interface CreatePaymentOrderResult {

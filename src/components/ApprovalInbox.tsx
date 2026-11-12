@@ -8,6 +8,7 @@ export interface ApprovalInboxProps {
   isSimulated: boolean;
   onApprove: (id: string) => Promise<void>;
   onReject: (id: string) => Promise<void>;
+  onRetryOrder?: (purchaseId: string) => Promise<void>;
 }
 
 export function ApprovalInbox({
@@ -15,6 +16,7 @@ export function ApprovalInbox({
   isSimulated,
   onApprove,
   onReject,
+  onRetryOrder,
 }: ApprovalInboxProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -111,12 +113,23 @@ export function ApprovalInbox({
                       Approved! Complete PayPal buyer step
                       {isSimulated ? " [SIMULATED]" : ""}:
                     </span>
-                    <a
-                      href={purchase.paypalApprovalUrl!}
-                      className="rounded-md bg-blue-600 px-3 py-1.5 font-semibold text-white shadow-xs hover:bg-blue-700"
-                    >
-                      Confirm payment on PayPal →
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={purchase.paypalApprovalUrl!}
+                        className="rounded-md bg-blue-600 px-3 py-1.5 font-semibold text-white shadow-xs hover:bg-blue-700"
+                      >
+                        Confirm payment on PayPal →
+                      </a>
+                      {onRetryOrder && (
+                        <button
+                          type="button"
+                          onClick={() => onRetryOrder(purchase.id)}
+                          className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 font-medium text-slate-700 shadow-xs hover:bg-slate-50"
+                        >
+                          Try again
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="mt-2.5 flex gap-2">
