@@ -71,7 +71,7 @@ Check items off as they are completed. Work in order. Do not start a phase until
 
 - [x] **T4.1 LlmClient interface, Anthropic implementation, Scripted implementation.** *Accept:* contract tests run against Scripted. Anthropic verified manually.
 - [x] **T4.2 Mandate parser service.** Structured output, Zod validation, one retry, clarifying question support. *Accept:* tests with Scripted client for valid, invalid-then-valid, and ambiguous inputs. Manual check with the demo mandate text from PRD section 10.
-- [ ] **T4.3 Agent service.** Tool-use loop with the three tools, iteration cap, untrusted-content wrapping, injection flagging. *Accept:* TDD 8.5 tests pass.
+- [x] **T4.3 Agent service.** Tool-use loop with the three tools, iteration cap, untrusted-content wrapping, injection flagging. *Accept:* TDD 8.5 tests pass.
 - [ ] **T4.4 API routes.** All routes in TDD section 7 with Zod validation and consistent errors. Health endpoint reports sandbox status and LLM mode. *Accept:* route tests for happy path and one failure path each.
 - [ ] **T4.5 Demo seed and reset.** `DEMO_MODE` seeding and `/api/demo/reset`. *Accept:* reset returns the app to a clean state in under 2 seconds.
 - [ ] **T4.6 Mock-LLM fixtures** for the five PRD demo scenarios. *Accept:* with `MOCK_LLM=1`, all five scenarios produce the expected decisions via the API.
