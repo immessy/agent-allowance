@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: agent-allowance
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-haiku-5-5
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: DATABASE_PATH
+        value: ./data/agent-allowance.db
+      - key: DEMO_MODE
+        value: "1"
+      - key: MOCK_LLM
+        value: "0"
+      - key: PAYMENT_MODE
+        sync: false

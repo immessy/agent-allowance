@@ -8,6 +8,8 @@
 [![Next.js: 16](https://img.shields.io/badge/Next.js-16%20App%20Router-black.svg)](https://nextjs.org)
 [![TypeScript: Strict](https://img.shields.io/badge/TypeScript-Strict%20noAny-blue.svg)](tsconfig.json)
 
+**Hosted Demo:** `https://your-service-name.onrender.com` *(Replace with your live Render URL)*
+
 ---
 
 ## The Problem & The Pitch
@@ -174,6 +176,53 @@ The catalog (`src/data/products.json`) and test suites demonstrate five canonica
 4. **Time Window Accuracy:** Monthly budgets are evaluated strictly within the UTC calendar month (`YYYY-MM-01T00:00:00.000Z` to `YYYY-MM-lastT23:59:59.999Z`).
 5. **Prompt-Injection Defense:** All catalog search results returned to the LLM are wrapped in `<untrusted_product_data>` tags and scanned for adversarial instructions.
 6. **Append-Only Audit Trail:** The database layer provides only `insert` and `read` methods for audit records.
+
+---
+
+## Deploying to Render
+
+Agent Allowance is fully pre-configured for one-click or Git-connected deployment to [Render](https://render.com) as a Node.js Web Service.
+
+### Quick Deploy with Blueprint (`render.yaml`)
+1. Fork or push this repository to your GitHub account.
+2. In the Render Dashboard, click **New +** → **Blueprint**.
+3. Select this repository. Render automatically detects `render.yaml` and provisions the Web Service with the correct build and start commands.
+4. When prompted, fill in the required environment variables:
+   - `APP_BASE_URL`: The public URL of your service (e.g. `https://agent-allowance.onrender.com`).
+   - `ANTHROPIC_API_KEY`: Your Anthropic API key (`sk-ant-...`), or leave blank if running in `MOCK_LLM=1` mode.
+   - `PAYPAL_CLIENT_ID` & `PAYPAL_CLIENT_SECRET`: Your PayPal Sandbox App credentials, or leave blank if running in `PAYMENT_MODE=simulated`.
+5. Click **Apply**. Render will install prebuilt Linux binaries for `better-sqlite3`, build the Next.js app, and boot the server.
+
+### Manual Web Service Configuration
+
+If creating a Web Service manually without Blueprints:
+
+| Setting | Value |
+|---|---|
+| **Runtime** | `Node` |
+| **Node Version** | `22.14.0` (pinned via `.node-version` and `engines` in `package.json`) |
+| **Build Command** | `npm ci && npm run build` |
+| **Start Command** | `npm start` |
+| **Health Check Path** | `/api/health` |
+
+#### Environment Variables
+
+| Variable | Required / Secret | Default / Description |
+|---|---|---|
+| `NODE_VERSION` | No | `22.14.0` — Render Node runtime version |
+| `ANTHROPIC_API_KEY` | Secret | Your Claude API key (`sk-ant-...`) |
+| `ANTHROPIC_MODEL` | No | `claude-haiku-5-5` |
+| `PAYPAL_ENV` | No | `sandbox` |
+| `PAYPAL_CLIENT_ID` | Secret | PayPal Sandbox REST App Client ID |
+| `PAYPAL_CLIENT_SECRET` | Secret | PayPal Sandbox REST App Secret Key |
+| `APP_BASE_URL` | Yes | Public HTTPS URL (e.g. `https://your-app.onrender.com`) for PayPal redirect callbacks |
+| `DATABASE_PATH` | No | `./data/agent-allowance.db` (auto-creates directory on ephemeral disk or Render Disk) |
+| `DEMO_MODE` | No | `1` — Automatically runs migrations and seeds catalog + baseline mandate on boot |
+| `MOCK_LLM` | No | `0` for live Anthropic, `1` for deterministic offline scenarios |
+| `PAYMENT_MODE` | No | Omit for live PayPal Sandbox; set to `simulated` for zero-credential demo |
+
+> [!TIP]
+> **Ephemeral Storage vs. Persistent Disks:** By default on free/starter tiers, SQLite writes to `./data/agent-allowance.db` on ephemeral storage. With `DEMO_MODE=1`, the database automatically initializes its tables and seeds the active mandate every time the instance starts or restarts. For persistent transaction histories across restarts, attach a Render Persistent Disk mounted at `/var/data` and set `DATABASE_PATH=/var/data/agent-allowance.db`.
 
 ---
 
