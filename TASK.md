@@ -56,12 +56,12 @@ Check items off as they are completed. Work in order. Do not start a phase until
 
 ## Phase 3: PayPal executor (about 3h)
 
-- [ ] **T3.1 PayPal client.** Token cache, create order, capture, idempotency header, error mapping, sandbox guard. *Accept:* TDD 8.4 tests pass with mocked fetch.
-- [ ] **T3.0 Mode B redirect smoke test (10m).** Create a `$1.00 USD` sandbox order, print only the `payer-action` URL, and stop so the user can verify sandbox buyer login works before building T3.2.
+- [x] **T3.1 PayPal client.** Token cache, create order, capture, idempotency header, error mapping, sandbox guard. *Accept:* TDD 8.4 tests pass with mocked fetch.
+- [x] **T3.0 Mode B redirect smoke test (10m).** Create a `$1.00 USD` sandbox order, print only the `payer-action` URL, and stop so the user can verify sandbox buyer login works before building T3.2.
 - [ ] **T3.2 Executor implementation** for Mode B (confirmed):
   - Create order (`intent: "CAPTURE"`, `payment_source.paypal.experience_context`), approval redirect (`payer-action`), return and cancel handlers, capture on return.
-  - *Accept:* a real sandbox purchase is captured end-to-end and visible in the PayPal sandbox dashboard. Order id appears in the audit log.
-- [ ] **T3.3 Architecture guard test.** TDD 8.6. *Accept:* test fails if a forbidden import is introduced (verify by temporarily adding one).
+  - *Accept:* a real sandbox purchase is captured end-to-end and visible in the PayPal sandbox dashboard. Order id appears in the audit log. *(Code implemented; awaiting user sandbox buyer login confirmation.)*
+- [x] **T3.3 Architecture guard test.** TDD 8.6. *Accept:* test fails if a forbidden import is introduced (verify by temporarily adding one).
 
 **Checkpoint 3:** one real sandbox payment succeeds through the orchestrator.
 
