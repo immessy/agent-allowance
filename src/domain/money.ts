@@ -113,3 +113,4 @@ export function multiplyCents(unitPriceCents: Cents, quantity: number): Cents {
   }
   return assertIntegerCents(unitPriceCents * quantity, "product");
 }
+

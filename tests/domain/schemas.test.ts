@@ -138,3 +138,4 @@ describe("domain schemas", () => {
     expect(AuditEventTypeSchema.safeParse("UNKNOWN_EVENT").success).toBe(false);
   });
 });
+

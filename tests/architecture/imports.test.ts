@@ -95,3 +95,4 @@ describe("Architecture boundary guards (T3.3, TDD 8.6)", () => {
     expect(violations).toEqual([]);
   });
 });
+

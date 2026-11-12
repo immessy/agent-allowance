@@ -71,3 +71,4 @@ describe("money utilities", () => {
     expect(() => addCents(Number.MAX_SAFE_INTEGER, 1)).toThrow();
   });
 });
+

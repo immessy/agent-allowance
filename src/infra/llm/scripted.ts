@@ -83,3 +83,4 @@ export class ScriptedLlmClient implements LlmClient {
     throw new LlmError("LLM_FAILED", "No scripted tool turn configured.");
   }
 }
+
